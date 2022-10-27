@@ -6,9 +6,10 @@
 #turn this file into a totally executable file
 #info of who is in a shop/
 
+#;0125674161?
 
 
-
+#TODO
 #goal is to view the login file on teams and know who is in the shop
 #ask tyler if he has his raspberry pi or find some in SDELC
 #get the scanner thing from PARSA
@@ -25,8 +26,6 @@ import time
 import png
 import getpass
 from tqdm.auto import tqdm
-import sqlite3
-import pyzbar.pyzbar as pyzbar
 import cv2
 import os
 import numpy
@@ -41,14 +40,16 @@ colorama.init(autoreset=True)
 #Function to scan Student ID card and read into scanner 
 #------ScanningFromCardReader---------------------
 def scan():#this reads the student id from the card reader
-    studentid=input()
-    scanlist=[]
-    filename = 'FSAETEAMLEAD.csv'
-    with open(filename, 'r') as csvfile:
-          csvreader=csv.reader(csvfile)
-        #   for row in csvfile:
-        #       if studentid==row[2]:
-        #           print('exist')              
+	studentid=input()
+	studentid=santize(studentid)
+	filename = 'FSAETEAMLEAD.csv'
+	with open(filename, 'r' ) as csvfile:
+		scanlist = list(csvfile)
+		csvreader=csv.reader(csvfile)
+		print(scanlist[1])
+		# for row in scanlist:
+			
+		# 	print(scanlist)
     
 
 
@@ -90,41 +91,48 @@ def scan():#this reads the student id from the card reader
 	#	os.makedirs('./QRCodes')
 	#qr.png("./QRCodes/" +E_name+ ".png",scale=8)
 
-def add_User():	
-    Li = []
-    E_name=str(input("Your Name: \n"))
-    E_id=str(input("Please Swipe Your Student ID: \n"))
-    E_id = E_id[2:10]
-    E_contac= input("Your Contact Phone Number: \n")
-    E_dept= input("Your Team Position: \n")
-    Li.extend((E_name,E_id,E_contac,E_dept))
-    #-----using List Comprehension to convert a list to str--------------
-    listToStr = ' '.join([str(elem) for elem in Li])
-    #print(listToStr)
-    print(Back.YELLOW + "Please Verify the Information")
-    print("Name               = "+ E_name)
-    print("Student ID         = "+ E_id)
-    print("Phone Number       = "+ E_contac)
-    print("Team Position      = "+ E_dept)
-    input(Back.LIGHTRED_EX + "Press Enter to continue or CTRL+C to Break Operation")
-    with open('FSAETEAMLEAD.csv','a')as adder:
-        writer_object = writer(adder)
-        writer_object.writerow(Li)
-        adder.close()
-    
+	
+#------This funcion would convert studentid number that is being swiped into actual studentid number----	
+def santize(E_id):
+	santized = E_id
+	santized = santized[2:11]
+	return santized
 
+def add_User():	
+	Li = []
+	E_name=str(input("Your Name: \n"))
+	E_id=str(input("Please Swipe Your Student ID: \n"))
+	E_id = santize(E_id)
+	E_contac= input("Your Contact Phone Number: \n")
+	E_dept= input("Your Team Position: \n")
+	Li.extend((E_name,E_id,E_contac,E_dept))
+    #-----using List Comprehension to convert a list to str--------------
+	listToStr = ' '.join([str(elem) for elem in Li])
+    #print(listToStr)
+	print(Back.YELLOW + "Please Verify the Information")
+	print("Name               = "+ E_name)
+	print("Student ID         = "+ E_id)
+	print("Phone Number       = "+ E_contac)
+	print("Team Position      = "+ E_dept)
+	input(Back.LIGHTRED_EX + "Press Enter to continue or CTRL+C to Break Operation")
+	with open('FSAETEAMLEAD.csv','a')as adder:
+		writer_object = writer(adder)
+		writer_object.writerow(Li)
+		adder.close()
+    
 #This function is used to create the 
 #--------------ViewDataset------------------------
 def viewdata():
-    rows = []
+	rows = []
 	with open("FSAETEAMLEAD.csv", 'r') as file:
-     csvreader=csv.reader(file)
-     header=next(csvreader)
-     for row in csvreader:
-         rows.append(row)
-    print(header)
-    print(row)
-    
+		csvreader=csv.reader(file)
+		header=next(csvreader)
+		for row in csvreader:
+			rows.append(row)
+			for printing in row:
+				print(printing)
+	#print(header[0],header[1])
+	#print(row[0], row[1])
     # read by default 1st sheet of an excel file
 # 	conn = sqlite3.connect('FSAETEAMLEADDatabase.db')
 # 	c = conn.cursor()
@@ -164,6 +172,7 @@ def login():
 
 #---Verifying User----
 #def verifyuser():
+
 
 #-------MainPage----------------------------
 def markattendance():
