@@ -1,0 +1,5 @@
+Here I am posting videos that might help for our project
+
+https://www.youtube.com/watch?v=BV6SLhOF3zU
+with this method we can share file to sharePoint with and from there we can give access to everyone to only view the time sheet file
+
