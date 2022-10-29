@@ -9,7 +9,8 @@
 #;0125674161?
 
 
-#TODO
+#TODO link python output to sync with MS Teams
+
 #goal is to view the login file on teams and know who is in the shop
 #ask tyler if he has his raspberry pi or find some in SDELC
 #get the scanner thing from PARSA
@@ -126,11 +127,11 @@ def viewdata():
 	rows = []
 	with open("FSAETEAMLEAD.csv", 'r') as file:
 		csvreader=csv.reader(file)
-		header=next(csvreader)
 		for row in csvreader:
 			rows.append(row)
-			for printing in row:
-				print(printing)
+			print(row)
+		# 	for printing in row:
+		# 		print(printing)
 	#print(header[0],header[1])
 	#print(row[0], row[1])
     # read by default 1st sheet of an excel file
