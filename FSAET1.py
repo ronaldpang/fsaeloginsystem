@@ -4,6 +4,7 @@
 #TODO get the raspberry pi from john
 #TODO swipe card once: login, swipe card twice:logout
 #TODO function that will erase all data if user selects its
+#TODO homescreen after 
 
 
 
@@ -31,16 +32,50 @@ def scan():#this reads the student id from the card reader
 	with open(filename, 'r' ) as csvfile:
 		scanlist = list(csvfile)
 		csvreader=csv.reader(csvfile)
-		print(scanlist[1])
+		print(scanlist)
 
-	
 #------This funcion would convert studentid number that is being swiped into actual studentid number----	
 def santize(E_id):
 	santized = E_id
 	santized = santized[2:11]
 	return santized
 
+#-------MainPage----------------------------
+def markattendance():
+	print("+------------------------------+")
+	print("|  1- Mark Attendance          |")
+	print("|  2- Admin Login              |")
+	print("+------------------------------+")
+	user_input2 = input("")
+	if user_input2== '1':
+		scan()
+	if user_input2 == '2':
+		login()
+markattendance()
 
+#----------AdminScreen-----------------------
+def afterlogin():
+	print("+------------------------------+")
+	print("|  1- Add New Team Lead         |")
+	print("|  2- View Record               |")
+	print("+------------------------------+")
+	user_input = input("Select one of the options: ")
+	if user_input == '1':
+		add_User()
+	if user_input == '2':
+		viewdata()
+
+#-----Return to screen------
+def screenchoice():
+    print("Press 1 to add another user: ")
+    print("Press 2 to view the record again: ")
+    user_input=input("What do you want to do now: ?")
+    if user_input=='1':
+        add_User()
+    if user_input=='2':
+        viewdata() 
+afterlogin()
+  
 #----Adding user to the system-----
 def add_User():	
 	Li = []
@@ -73,20 +108,8 @@ def viewdata():
 		for row in csvreader:
 			rows.append(row)
 			print(row)
-   
-#----------AdminScreen-----------------------
-def afterlogin():
-	print("+------------------------------+")
-	print("|  1- Add New Team Lead         |")
-	print("|  2- View Record               |")
-	print("+------------------------------+")
-	user_input = input("")
-	if user_input == '1':
-		add_User()
-	if user_input == '2':
-		viewdata()
-		
 
+   
 #----------Login---------------
 def login():
 	print(Back.CYAN+ 'Please Enter Password :')
@@ -106,17 +129,3 @@ def login():
 #def verifyuser():
 
 
-#-------MainPage----------------------------
-def markattendance():
-	print("+------------------------------+")
-	print("|  1- Mark Attendance          |")
-	print("|  2- Admin Login              |")
-	print("+------------------------------+")
-	user_input2 = input("")
-	if user_input2== '1':
-		scan()
-	if user_input2 == '2':
-		login()
-markattendance()
-
-#create a function that will erase all created data entered into the excel sheet
