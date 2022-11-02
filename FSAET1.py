@@ -119,4 +119,4 @@ def markattendance():
 		login()
 markattendance()
 
-#create a function that will erase all created data entered into the excel sheet
+#create a function that will erase all created data entered into the excel sheet.
