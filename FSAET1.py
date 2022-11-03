@@ -4,6 +4,7 @@
 #TODO get the raspberry pi from john
 #TODO swipe card once: login, swipe card twice:logout
 #TODO function that will erase all data if user selects its
+#TODO function that allows user to navigate through the screen
 
 
 
@@ -22,6 +23,15 @@ import csv
 import pandas as pd
 colorama.init(autoreset=True)
 
+#------This funcion would convert studentid number that is being swiped into actual studentid number----	
+def santize(E_id):
+	santized = E_id
+	santized = santized[2:11]
+	return santized
+# ron's hot
+#---Verifying User----
+#def verifyuser():
+
 #Function to scan Student ID card and read into scanner 
 #------ScanningFromCardReader---------------------
 def scan():#this reads the student id from the card reader
@@ -32,14 +42,6 @@ def scan():#this reads the student id from the card reader
 		scanlist = list(csvfile)
 		csvreader=csv.reader(csvfile)
 		print(scanlist[1])
-
-	
-#------This funcion would convert studentid number that is being swiped into actual studentid number----	
-def santize(E_id):
-	santized = E_id
-	santized = santized[2:11]
-	return santized
-
 
 #----Adding user to the system-----
 def add_User():	
@@ -85,7 +87,17 @@ def afterlogin():
 		add_User()
 	if user_input == '2':
 		viewdata()
-		
+
+#-----Screenchoice--------
+def screenchoice():
+    print("Press 1 to add another user: ")
+    print("Press 2 to view the record again: ")
+    user_input=input("Which screen would you like to go back to: ")
+    if user_input=='1':
+        add_User()
+    if user_input=='2':
+        viewdata()
+    print("You will now be moved back to the home screen")
 
 #----------Login---------------
 def login():
@@ -102,9 +114,6 @@ def login():
 		print("Invalid Password")
 		login()
 
-#---Verifying User----
-#def verifyuser():
-
 
 #-------MainPage----------------------------
 def markattendance():
@@ -118,5 +127,9 @@ def markattendance():
 	if user_input2 == '2':
 		login()
 markattendance()
+screenchoice()
 
-#create a function that will erase all created data entered into the excel sheet.
+
+
+
+
