@@ -33,18 +33,23 @@ def santize(E_id):
 #def verifyuser():
 
 #Function to scan Student ID card and read into scanner 
+#------Build log DataFrame------------------------
+def build_df(filename:str) -> pd.DataFrame:
+	filename = 'FSAETEAMLEAD.csv'
+	if(os.path.isfile(filename)):
+		df_log = pd.read_csv(filename)
+	return df_log
+
 #------ScanningFromCardReader---------------------
-def scan():#this reads the student id from the card reader
+def scan() -> None:#this reads the student id from the card reader
 	studentid=input()
 	studentid=santize(studentid)
 	filename = 'FSAETEAMLEAD.csv'
-	with open(filename, 'r' ) as csvfile:
-		scanlist = list(csvfile)
-		csvreader=csv.reader(csvfile)
-		print(scanlist[1])
+	df_log = pd.read_csv(filename)
+	print(df_log[df_log['ID']] == studentid)
 
 #----Adding user to the system-----
-def add_User():	
+def add_User() -> None:	
 	Li = []
 	E_name=str(input("Your Name: \n"))
 	E_id=str(input("Please Swipe Your Student ID: \n"))
@@ -68,7 +73,7 @@ def add_User():
     
 #This function is used to create the 
 #--------------ViewDataset------------------------
-def viewdata():
+def viewdata() -> None:
 	rows = []
 	with open("FSAETEAMLEAD.csv", 'r') as file:
 		csvreader=csv.reader(file)
@@ -77,7 +82,7 @@ def viewdata():
 			print(row)
    
 #----------AdminScreen-----------------------
-def afterlogin():
+def afterlogin() -> None:
 	print("+------------------------------+")
 	print("|  1- Add New Team Lead         |")
 	print("|  2- View Record               |")
@@ -89,7 +94,7 @@ def afterlogin():
 		viewdata()
 
 #-----Screenchoice--------
-def screenchoice():
+def screenchoice() -> None:
     print("Press 1 to add another user: ")
     print("Press 2 to view the record again: ")
     user_input=input("Which screen would you like to go back to: ")
@@ -100,7 +105,7 @@ def screenchoice():
     print("You will now be moved back to the home screen")
 
 #----------Login---------------
-def login():
+def login() -> None:
 	print(Back.CYAN+ 'Please Enter Password :')
 	print(Back.YELLOW+"Student ID Attendance System")
 	password = getpass.getpass()
@@ -126,10 +131,12 @@ def markattendance():
 		scan()
 	if user_input2 == '2':
 		login()
-markattendance()
-screenchoice()
 
 
-
-
-
+# ------- Main Driver--------
+if __name__ == "__main__":
+	filename = 'FSAETEAMLEAD.csv'
+	log = build_df(filename)
+	print(log, '\n')
+	markattendance()
+	screenchoice()
