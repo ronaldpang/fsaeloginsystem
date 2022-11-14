@@ -30,7 +30,9 @@ def santize(E_id):
 	return santized
 # ron's hot
 #---Verifying User----
-#def verifyuser():
+def verifyuser():
+	if(df_log[df_log['ID'] == studentid]): #search for ID in dataframe
+		
 
 #Function to scan Student ID card and read into scanner 
 #------Build log DataFrame------------------------
@@ -46,7 +48,6 @@ def scan() -> None:#this reads the student id from the card reader
 	studentid=santize(studentid)
 	filename = 'FSAETEAMLEAD.csv'
 	df_log = pd.read_csv(filename)
-	print(df_log[df_log['ID']] == studentid)
 
 #----Adding user to the system-----
 def add_User() -> None:	
