@@ -21,18 +21,24 @@ from colorama import Back, Style
 from csv import writer
 import csv
 import pandas as pd
+import numpy as np
 colorama.init(autoreset=True)
 
 #------This funcion would convert studentid number that is being swiped into actual studentid number----	
 def santize(E_id):
 	santized = E_id
-	santized = santized[2:11]
+	santized = santized[2:10]
 	return santized
 # ron's hot
 #---Verifying User----
-def verifyuser():
-	if(df_log[df_log['ID'] == studentid]): #search for ID in dataframe
-		
+def verifyuser(userID: int, df_log: pd.DataFrame):
+	search_series = pd.Series(df_log.ID)
+	#print(userID)
+	#print(search_series)
+	print(type(search_series.values))
+	if int(userID) in search_series.values:
+		print("Found ID")
+		# need to search log for row with matched ID and check if absent vs present
 
 #Function to scan Student ID card and read into scanner 
 #------Build log DataFrame------------------------
@@ -48,6 +54,7 @@ def scan() -> None:#this reads the student id from the card reader
 	studentid=santize(studentid)
 	filename = 'FSAETEAMLEAD.csv'
 	df_log = pd.read_csv(filename)
+	verifyuser(studentid, df_log)
 
 #----Adding user to the system-----
 def add_User() -> None:	
