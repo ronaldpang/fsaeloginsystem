@@ -23,22 +23,27 @@ import csv
 import pandas as pd
 import numpy as np
 colorama.init(autoreset=True)
+import re
 
 #------This funcion would convert studentid number that is being swiped into actual studentid number----	
 def santize(E_id):
-	santized = E_id
-	santized = santized[2:10]
-	return santized
+	# Perform regex match on ID string, ignoring characters
+	re_sanitized = re.split(r'(1[0-9]{6})', E_id)
+	
+	# Search the list returned by regex.split for the ID string
+	for item in re_sanitized:
+		if len(item) == 7: # Student IDs are 8 digits long, 7 if indexed at 0
+			re_sanitized = item
+	# Type conversion to int
+	re_sanitized = int(re_sanitized)
+	return re_sanitized
 # ron's hot
 #---Verifying User----
 def verifyuser(userID: int, df_log: pd.DataFrame):
 	search_series = pd.Series(df_log.ID)
-	#print(userID)
-	#print(search_series)
-	print(type(search_series.values))
 	if int(userID) in search_series.values:
 		print("Found ID")
-		# need to search log for row with matched ID and check if absent vs present
+		#print(df_log[df_log["ID"] == int(userID)].index)
 
 #Function to scan Student ID card and read into scanner 
 #------Build log DataFrame------------------------
