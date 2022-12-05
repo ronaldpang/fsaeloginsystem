@@ -28,22 +28,50 @@ import re
 #------This funcion would convert studentid number that is being swiped into actual studentid number----	
 def santize(E_id):
 	# Perform regex match on ID string, ignoring characters
-	re_sanitized = re.split(r'(1[0-9]{6})', E_id)
+	re_sanitized = re.split(r'(1[0-9]{7})', E_id)
 	
 	# Search the list returned by regex.split for the ID string
 	for item in re_sanitized:
-		if len(item) == 7: # Student IDs are 8 digits long, 7 if indexed at 0
+		if len(item) == 8: # Student IDs are 8 digits long, 7 if indexed at 0
 			re_sanitized = item
 	# Type conversion to int
 	re_sanitized = int(re_sanitized)
 	return re_sanitized
+
 # ron's hot
-#---Verifying User----
-def verifyuser(userID: int, df_log: pd.DataFrame):
-	search_series = pd.Series(df_log.ID)
-	if int(userID) in search_series.values:
-		print("Found ID")
-		#print(df_log[df_log["ID"] == int(userID)].index)
+
+#---Verifying User---- (TEST ME FIRST)
+def verifyuser(userID: int, df_log: pd.DataFrame) -> pd.Series:
+	isUser: bool = False
+	for index,row in df_log.iterrows():
+		if(row["ID"] == userID):
+			userRow = pd.Series(row)
+			return userRow
+		else: # User does not exist in log, so we prompt them to add themselves to it
+			# create user entry in log
+			# create series from newly created row (or vice versa)
+			pass
+			return userRow
+
+# vvv These functions needs testing vvv
+"""	
+#---Check-In---
+def checkIn(userID: int, userRow: pd.Series) -> pd.Series:
+	if(userRow['Present:'] == "Present"):
+		userRow['Present:'] = "Absent"
+		userRow['Time Out:'] = time.now()
+	else:
+		userRow['Present:'] == "Present"
+		userRow['Time In:'] = time.now()
+	return userRow
+
+
+#---Update Log---
+def update_log(userRow: pd.Series, df_log: pd.DataFrame):
+	for index, row in df_log:
+		if(row["ID"] == userRow["ID"]):
+			row = userRow
+"""
 
 #Function to scan Student ID card and read into scanner 
 #------Build log DataFrame------------------------
