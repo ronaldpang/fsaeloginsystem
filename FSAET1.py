@@ -9,7 +9,7 @@
 
 
 #-----libraries used: time, png, getpass, tqdm, sqlite3, pyzbar, pyqrcode, cv2, os, numpy, colorama----
-import time
+import datetime
 import png
 import getpass
 from tqdm.auto import tqdm
@@ -43,29 +43,29 @@ def santize(E_id):
 #---Verifying User---- (TEST ME FIRST)
 def verifyuser(userID: int, df_log: pd.DataFrame) -> pd.Series:
 	isUser: bool = False
-	for index,row in df_log.iterrows():
+	userRow: pd.Series
+	for index, row in df_log.iterrows():
 		if(row["ID"] == userID):
 			userRow = pd.Series(row)
+			#print("before check in: ", userRow)
+			userRow = check_In(userRow)
+			#print("after check in: ", userRow)
 			return userRow
 		else: # User does not exist in log, so we prompt them to add themselves to it
 			# create user entry in log
 			# create series from newly created row (or vice versa)
 			pass
-			return userRow
+			#return userRow
 
-# vvv These functions needs testing vvv
-"""	
 #---Check-In---
-def checkIn(userID: int, userRow: pd.Series) -> pd.Series:
-	if(userRow['Present:'] == "Present"):
-		userRow['Present:'] = "Absent"
-		userRow['Time Out:'] = time.now()
+def check_In(userRow: pd.Series) -> pd.Series:
+	if(userRow['If Present:'] == "Present"):
+		log_time = datetime.datetime.now()
 	else:
-		userRow['Present:'] == "Present"
-		userRow['Time In:'] = time.now()
+		log_time = datetime.datetime.now()
 	return userRow
 
-
+"""
 #---Update Log---
 def update_log(userRow: pd.Series, df_log: pd.DataFrame):
 	for index, row in df_log:
@@ -82,11 +82,10 @@ def build_df(filename:str) -> pd.DataFrame:
 	return df_log
 
 #------ScanningFromCardReader---------------------
-def scan() -> None:#this reads the student id from the card reader
+def scan(df_log: pd.DataFrame) -> None:#this reads the student id from the card reader
 	studentid=input()
 	studentid=santize(studentid)
 	filename = 'FSAETEAMLEAD.csv'
-	df_log = pd.read_csv(filename)
 	verifyuser(studentid, df_log)
 
 #----Adding user to the system-----
@@ -112,7 +111,7 @@ def add_User() -> None:
 		writer_object.writerow(Li)
 		adder.close()
     
-#This function is used to create the 
+#This function is used to create the data set
 #--------------ViewDataset------------------------
 def viewdata() -> None:
 	rows = []
@@ -162,14 +161,14 @@ def login() -> None:
 
 
 #-------MainPage----------------------------
-def markattendance():
+def markattendance(df_log: pd.DataFrame):
 	print("+------------------------------+")
 	print("|  1- Mark Attendance          |")
 	print("|  2- Admin Login              |")
 	print("+------------------------------+")
 	user_input2 = input("")
 	if user_input2== '1':
-		scan()
+		scan(df_log)
 	if user_input2 == '2':
 		login()
 
@@ -179,5 +178,5 @@ if __name__ == "__main__":
 	filename = 'FSAETEAMLEAD.csv'
 	log = build_df(filename)
 	print(log, '\n')
-	markattendance()
+	markattendance(log)
 	screenchoice()
