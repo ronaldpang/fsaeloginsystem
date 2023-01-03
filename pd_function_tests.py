@@ -20,7 +20,8 @@ import time
 import png
 import getpass
 from tqdm.auto import tqdm
-import cv2
+
+# import cv2
 import os
 import numpy
 import colorama
@@ -38,7 +39,7 @@ import sys
 def build_df(filename: str) -> pd.DataFrame:
     if os.path.isfile(filename):
         df_log = pd.read_csv(filename)
-    df_log = df_log.set_index("ID")
+    df_log.set_index("ID", inplace=True)
     return df_log
 
 
@@ -47,6 +48,7 @@ def locate_user(userID: int, log: pd.DataFrame) -> pd.Series:
     try:
         return pd.Series(log.loc[userID])
     except KeyError:
+        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
         print(
             "Specified ID is not in log. Please check if ID entered is correct, or add new user."
         )
@@ -69,6 +71,7 @@ def clock_in(userID: int, log: pd.DataFrame) -> pd.DataFrame:
         log.at[userID, "Attendance"] = "Present"
         return log
     except KeyError:
+        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
         print(
             "Specified ID is not in log. Please check if ID entered is correct, or add new user."
         )
@@ -90,6 +93,7 @@ def clock_out(userID: int, log: pd.DataFrame) -> pd.DataFrame:
         log.at[userID, "Attendance"] = "Absent"
         return log
     except KeyError:
+        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
         print(
             "Specified ID is not in log. Please check if ID entered is correct, or add new user."
         )
@@ -100,12 +104,13 @@ def clock_out(userID: int, log: pd.DataFrame) -> pd.DataFrame:
 # ------Add User------------------------
 def add_user(log: pd.DataFrame) -> pd.DataFrame:
     userID: int = scan(log)
+    # Note to Ron - These input statements are placeholders; feel free to replace with UX messages if you so choose
     userName: str = input("Please provide your First and Last name.")
     userNum: str = input("Please provide your phone number.")
     userTitle: str = input("Please provide your team title or role.")
     new_row = pd.Series(
         {
-            "ID": userID,
+            "ID": int(userID),
             "Phone Num": userNum,
             "Name": userName,
             "Title": userTitle,
@@ -115,10 +120,15 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
             "If Present": None,
         }
     )
-    new_row = new_row.to_frame()
-    print(new_row)
-    new_row.set_index("ID")
-    pd.concat([log, new_row], ignore_index=True)
+    # Reset the two table's indexes before concatination
+    log.reset_index(drop=False, inplace=True)
+    # Combine
+    log = pd.concat([log, new_row.to_frame().T], ignore_index=True)
+    # Set ID column to type int
+    log["ID"] = log["ID"].astype(int)
+    # Set index to ID
+    log.set_index("ID")
+
     return log
 
 
