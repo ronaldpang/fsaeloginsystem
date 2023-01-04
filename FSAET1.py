@@ -1,17 +1,15 @@
+#TODO link python output to sync with MS Teams
 #TODO implement the veriy user system
 #TODO make an excel sheet with all of the team leads info
+#TODO get the raspberry pi from john
 #TODO swipe card once: login, swipe card twice:logout
 #TODO function that will erase all data if user selects its
-#TODO function that allows user to navigate through the screen #DONE
-#TODO implementation of the raspberry pi as a login system
-#TODO rework the screenchoice() UI
-#TODO make an excutable file that could run off of the raspberry pi
-#TODO ensure that indents and spacing are all regular instead of tab spacing
+#TODO function that allows user to navigate through the screen
 
 
 
-#-----libraries used: time, png, getpass, tqdm, sqlite3, pyzbar, pyqrcode, cv2, os, numpy, colorama, pandas, numpy, re----
-import time
+#-----libraries used: time, png, getpass, tqdm, sqlite3, pyzbar, pyqrcode, cv2, os, numpy, colorama----
+import datetime
 import png
 import getpass
 from tqdm.auto import tqdm
@@ -28,7 +26,7 @@ colorama.init(autoreset=True)
 import re
 
 #------This funcion would convert studentid number that is being swiped into actual studentid number----	
-def sanitize(E_id):
+def santize(E_id):
 	# Perform regex match on ID string, ignoring characters
 	re_sanitized = re.split(r'(1[0-9]{7})', E_id)
 	
@@ -40,34 +38,34 @@ def sanitize(E_id):
 	re_sanitized = int(re_sanitized)
 	return re_sanitized
 
+# ron's hot
 
 #---Verifying User---- (TEST ME FIRST)
 def verifyuser(userID: int, df_log: pd.DataFrame) -> pd.Series:
-    isUser: bool = False
-    for index,row in df_log.iterrows():
-        if(row["ID"] == userID):
-            userRow = pd.Series(row)
-            return userRow
-        else: 
-            # User does not exist in log, so we prompt them to add themselves to it
-		    # create user entry in log
-	        # create series from newly created row (or vice versa)
-            pass
-            return userRow
+	isUser: bool = False
+	userRow: pd.Series
+	for index, row in df_log.iterrows():
+		if(row["ID"] == userID):
+			userRow = pd.Series(row)
+			#print("before check in: ", userRow)
+			userRow = check_In(userRow)
+			#print("after check in: ", userRow)
+			return userRow
+		else: # User does not exist in log, so we prompt them to add themselves to it
+			# create user entry in log
+			# create series from newly created row (or vice versa)
+			pass
+			#return userRow
 
-# vvv These functions needs testing vvv
-"""	
 #---Check-In---
-def checkIn(userID: int, userRow: pd.Series) -> pd.Series:
-	if(userRow['Present:'] == "Present"):
-		userRow['Present:'] = "Absent"
-		userRow['Time Out:'] = time.now()
+def check_In(userRow: pd.Series) -> pd.Series:
+	if(userRow['If Present:'] == "Present"):
+		log_time = datetime.datetime.now()
 	else:
-		userRow['Present:'] == "Present"
-		userRow['Time In:'] = time.now()
+		log_time = datetime.datetime.now()
 	return userRow
 
-
+"""
 #---Update Log---
 def update_log(userRow: pd.Series, df_log: pd.DataFrame):
 	for index, row in df_log:
@@ -84,11 +82,10 @@ def build_df(filename:str) -> pd.DataFrame:
 	return df_log
 
 #------ScanningFromCardReader---------------------
-def scan() -> None:#this reads the student id from the card reader
+def scan(df_log: pd.DataFrame) -> None:#this reads the student id from the card reader
 	studentid=input()
-	studentid=sanitize(studentid)
+	studentid=santize(studentid)
 	filename = 'FSAETEAMLEAD.csv'
-	df_log = pd.read_csv(filename)
 	verifyuser(studentid, df_log)
 
 #----Adding user to the system-----
@@ -96,7 +93,7 @@ def add_User() -> None:
 	Li = []
 	E_name=str(input("Your Name: \n"))
 	E_id=str(input("Please Swipe Your Student ID: \n"))
-	E_id = sanitize(E_id)
+	E_id = santize(E_id)
 	E_contac= input("Your Contact Phone Number: \n")
 	E_dept= input("Your Team Position: \n")
 	Li.extend((E_name,E_id,E_contac,E_dept))
@@ -114,7 +111,7 @@ def add_User() -> None:
 		writer_object.writerow(Li)
 		adder.close()
     
-#This function is used to create the 
+#This function is used to create the data set
 #--------------ViewDataset------------------------
 def viewdata() -> None:
 	rows = []
@@ -126,23 +123,15 @@ def viewdata() -> None:
    
 #----------AdminScreen-----------------------
 def afterlogin() -> None:
-    print("+------------------------------+")
-    print("|  1- Add New Team Lead         |")
-    print("|  2- View Record               |")
-    print("+------------------------------+")
-    user_input = input("")
-    if user_input=='1':
-        add_User()
-    if user_input=='2':
-        viewdata()
-    while user_input != '1' or user_input != '2':
-        user_input=input("Select either 1 or 2: ")
-        if user_input == '1':
-            add_User()
-            break
-        if user_input == '2':
-            viewdata()
-            break
+	print("+------------------------------+")
+	print("|  1- Add New Team Lead         |")
+	print("|  2- View Record               |")
+	print("+------------------------------+")
+	user_input = input("")
+	if user_input == '1':
+		add_User()
+	if user_input == '2':
+		viewdata()
 
 #-----Screenchoice--------
 def screenchoice() -> None:
@@ -154,7 +143,6 @@ def screenchoice() -> None:
     if user_input=='2':
         viewdata()
     print("You will now be moved back to the home screen")
-    
 
 #----------Login---------------
 def login() -> None:
@@ -171,24 +159,24 @@ def login() -> None:
 		print("Invalid Password")
 		login()
 
-#
+
 #-------MainPage----------------------------
-def markattendance():
+def markattendance(df_log: pd.DataFrame):
 	print("+------------------------------+")
 	print("|  1- Mark Attendance          |")
 	print("|  2- Admin Login              |")
 	print("+------------------------------+")
 	user_input2 = input("")
 	if user_input2== '1':
-		scan()
+		scan(df_log)
 	if user_input2 == '2':
 		login()
 
 
 # ------- Main Driver--------
 if __name__ == "__main__":
-    filename = 'FSAETEAMLEAD.csv'
-    log = build_df(filename)
-    print(log, '\n')
-    markattendance()
-    screenchoice()
+	filename = 'FSAETEAMLEAD.csv'
+	log = build_df(filename)
+	print(log, '\n')
+	markattendance(log)
+	screenchoice()
