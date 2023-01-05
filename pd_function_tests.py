@@ -1,7 +1,6 @@
 # ========================= JAKE TO DO LIST =========================
-# TODO add exception handling to erase_user
-# TODO finish exception handling
-# TODO test add_user edge cases
+# TODO add exception handling in main
+# TODO remove days from the duration output
 # TODO test update function edge cases
 
 # ========================= MAIN TO DO LIST =========================
@@ -24,7 +23,6 @@ from tqdm.auto import tqdm
 
 # import cv2
 import os
-import numpy
 import colorama
 from colorama import Back, Style
 from csv import writer
@@ -46,60 +44,30 @@ def build_df(filename: str) -> pd.DataFrame:
 
 # ------Locate User------------------------
 def locate_user(userID: int, log: pd.DataFrame) -> pd.Series:
-    try:
-        return pd.Series(log.loc[userID])
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
-        # else add new user
+    return pd.Series(log.loc[userID])
 
 
 # ------Clock In------------------------
-def clock_in(userID: int, log: pd.DataFrame) -> pd.DataFrame:
-    try:
-        curr_time = datetime.datetime.now()
-        log.at[userID, "Time In"] = (
-            str(curr_time.hour)
-            + ":"
-            + str(curr_time.minute)
-            + ":"
-            + str(curr_time.second)
-        )
-        log.at[userID, "Time Out"] = "None"
-        log.at[userID, "Attendance"] = "Present"
-        return log
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
-        # else add new user
+def clock_in(userID: int, log: pd.DataFrame) -> None:
+    curr_time = datetime.datetime.now()
+    log.at[userID, "Time Entered:"] = (
+        str(curr_time.hour) + ":" + str(curr_time.minute) + ":" + str(curr_time.second)
+    )
+    log.at[userID, "Time Checkout:"] = np.nan
+    log.at[userID, "If Present:"] = "Present"
 
 
 # ------Clock Out------------------------
-def clock_out(userID: int, log: pd.DataFrame) -> pd.DataFrame:
-    try:
-        curr_time = datetime.datetime.now()
-        log.at[userID, "Time Out"] = (
-            str(curr_time.hour)
-            + ":"
-            + str(curr_time.minute)
-            + ":"
-            + str(curr_time.second)
-        )
-        log.at[userID, "Attendance"] = "Absent"
-        return log
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
-        # else add new user
+def clock_out(userID: int, log: pd.DataFrame) -> None:
+    curr_time = datetime.datetime.now()
+    log.at[userID, "Time Checkout:"] = (
+        str(curr_time.hour) + ":" + str(curr_time.minute) + ":" + str(curr_time.second)
+    )
+    log.at[userID, "If Present:"] = "Absent"
+    time_difference = curr_time - datetime.datetime.strptime(
+        log.at[userID, "Time Entered:"], "%H:%M:%S"
+    )
+    log.at[userID, "Duration:"] = time_difference
 
 
 # ------Add User------------------------
@@ -109,16 +77,36 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
     userName: str = input("Please provide your First and Last name.")
     userNum: str = input("Please provide your phone number.")
     userTitle: str = input("Please provide your team title or role.")
+    # Measure current time
+    curr_time = datetime.datetime.now()
+    # Sometimes the time will print one digit for minutes, when it should lead with a zero
+    if curr_time.minute < 10:
+        pres_time = (
+            str(curr_time.hour)
+            + ":0"
+            + str(curr_time.minute)
+            + ":"
+            + str(curr_time.second)
+        )
+    else:
+        pres_time = (
+            str(curr_time.hour)
+            + ":"
+            + str(curr_time.minute)
+            + ":"
+            + str(curr_time.second)
+        )
+    # Fill in new row with info
     new_row = pd.Series(
         {
             "ID": int(userID),
             "Phone Num": userNum,
             "Name": userName,
             "Title": userTitle,
-            "Time Entered": None,
-            "Time Checkout": None,
-            "Duration": None,
-            "If Present": None,
+            "Time Entered:": pres_time,
+            "Time Checkout:": np.nan,
+            "Duration:": np.nan,
+            "If Present:": "Present",
         }
     )
     # Reset the two table's indexes before concatination
@@ -128,48 +116,27 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
     # Set ID column to type int
     log["ID"] = log["ID"].astype(int)
     # Set index to ID
-    log.set_index("ID")
+    log = log.set_index("ID")
 
     return log
 
 
 # ------Update name------------------------
 def update_name(userID: int, log: pd.DataFrame) -> None:
-    try:
-        new_name: str = input("Please enter your new username.")
-        log.loc[userID, "Name"] = new_name
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
+    new_name: str = input("Please enter your new username.")
+    log.loc[userID, "Name"] = new_name
 
 
 # ------Update Number------------------------
 def update_number(userID: int, log: pd.DataFrame) -> None:
-    try:
-        new_num: str = input("Please enter your new phone number.")
-        log.loc[userID, "Phone Num"] = new_num
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
+    new_num: str = input("Please enter your new phone number.")
+    log.loc[userID, "Phone Num"] = new_num
 
 
 # ------Update Title------------------------
 def update_title(userID: int, log: pd.DataFrame) -> None:
-    try:
-        new_title: str = input("Please enter your new title.")
-        log.loc[userID, "Title"] = new_title
-    except KeyError:
-        # Note to Ron - Error statements are placeholders; I plan on handling exceptions for an incorrect ID at some point
-        print(
-            "Specified ID is not in log. Please check if ID entered is correct, or add new user."
-        )
-        # retry here
+    new_title: str = input("Please enter your new title.")
+    log.loc[userID, "Title"] = new_title
 
 
 # ------Erase User------------------------
@@ -183,10 +150,6 @@ def erase_user(userID: int, log: pd.DataFrame) -> None:
         )
         if confirm2.upper() == "YES" or confirm2.upper() == "Y":
             log.drop([userID], axis=0, inplace=True)
-        else:
-            pass
-    else:
-        pass
 
 
 # ------ScanningFromCardReader---------------------
@@ -228,18 +191,21 @@ if __name__ == "__main__":
     test_log = clock_out(12526038, test_log)
     print(test_log)
     print(divider)
-    # Add_user test
-    test_log = add_user(test_log)
-    print(test_log)
-    print(divider)
     # Update user functions
     update_name(12526038, test_log)
     update_number(12526038, test_log)
     update_title(12526038, test_log)
     print(test_log)
     print(divider)
-    """
     # Erase_user test
     erase_user(12569902, test_log)
+    print(test_log)
+    print(divider)
+    """
+    # Add_user test
+    test_log = add_user(test_log)
+    print(test_log)
+    print(divider)
+    clock_out(12563998, test_log)
     print(test_log)
     print(divider)
