@@ -209,10 +209,18 @@ def afterlogin() -> None:
     print("|  2- View Record               |")
     print("+------------------------------+")
     user_input = input("")
-    if user_input == "1":
+    if user_input=='1':
         add_User()
-    if user_input == "2":
+    if user_input=='2':
         viewdata()
+    while user_input != '1' or user_input != '2':
+        user_input=input("Select either 1 or 2: ")
+        if user_input == '1':
+            add_User()
+            break
+        if user_input == '2':
+            viewdata()
+            break
 
 
 # -----Screenchoice--------
