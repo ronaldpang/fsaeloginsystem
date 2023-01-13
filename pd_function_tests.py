@@ -50,9 +50,7 @@ def locate_user(userID: int, log: pd.DataFrame) -> pd.Series:
 # ------Clock In------------------------
 def clock_in(userID: int, log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
-    log.at[userID, "Time Entered:"] = (
-        str(curr_time.hour) + ":" + str(curr_time.minute) + ":" + str(curr_time.second)
-    )
+    log.at[userID, "Time Entered:"] = curr_time
     log.at[userID, "Time Checkout:"] = np.nan
     log.at[userID, "If Present:"] = "Present"
 
@@ -60,13 +58,10 @@ def clock_in(userID: int, log: pd.DataFrame) -> None:
 # ------Clock Out------------------------
 def clock_out(userID: int, log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
-    log.at[userID, "Time Checkout:"] = (
-        str(curr_time.hour) + ":" + str(curr_time.minute) + ":" + str(curr_time.second)
-    )
+    log.at[userID, "Time Checkout:"] = curr_time
     log.at[userID, "If Present:"] = "Absent"
-    time_difference = curr_time - datetime.datetime.strptime(
-        log.at[userID, "Time Entered:"], "%H:%M:%S"
-    )
+    # This bit is boken
+    time_difference = curr_time - log.at[userID, "Time Entered:"]
     log.at[userID, "Duration:"] = time_difference
 
 
@@ -79,23 +74,6 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
     userTitle: str = input("Please provide your team title or role.")
     # Measure current time
     curr_time = datetime.datetime.now()
-    # Sometimes the time will print one digit for minutes, when it should lead with a zero
-    if curr_time.minute < 10:
-        pres_time = (
-            str(curr_time.hour)
-            + ":0"
-            + str(curr_time.minute)
-            + ":"
-            + str(curr_time.second)
-        )
-    else:
-        pres_time = (
-            str(curr_time.hour)
-            + ":"
-            + str(curr_time.minute)
-            + ":"
-            + str(curr_time.second)
-        )
     # Fill in new row with info
     new_row = pd.Series(
         {
@@ -103,7 +81,7 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
             "Phone Num": userNum,
             "Name": userName,
             "Title": userTitle,
-            "Time Entered:": pres_time,
+            "Time Entered:": curr_time,
             "Time Checkout:": np.nan,
             "Duration:": np.nan,
             "If Present:": "Present",
