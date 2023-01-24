@@ -411,6 +411,11 @@ def attendance_loop(df_log: pd.DataFrame) -> None:
     while True:
         try:
             user_ID = scan(df_log)
+            # Mark user's attendance in the log
+            if get_attendance(user_ID, df_log).upper() == "PRESENT":
+                clock_out(user_ID, df_log)
+            else:
+                clock_in(user_ID, df_log)
         except KeyError:
             print(
                 "This user is not entered into the system. Please contact the system admin."
@@ -433,12 +438,6 @@ def attendance_loop(df_log: pd.DataFrame) -> None:
             if stop_command.upper() == "X":
                 sys.exit()
             break
-        else:
-            # Mark user's attendance in the log
-            if get_attendance(user_ID, df_log).upper() == "PRESENT":
-                clock_out(user_ID, df_log)
-            else:
-                clock_in(user_ID, df_log)
 
 
 """
