@@ -1,17 +1,9 @@
 # ========================= JAKE TO DO LIST =========================
-# TODO remove microseconds from the duration output
-# TODO write clock_in / clock_out function, and update, infinitely
-# TODO Rework main menu structure
+# TODO make punch clock run infinitely / Rework main menu structure
+# TODO sync csv to onedrive
 # TODO function that allows user to navigate through the screen (go back if you select the wrong menu)
 # TODO finish exception handling
 #   TODO Finalize sanitize exception handling
-<<<<<<< HEAD
-=======
-# TODO add admin menu to main_menu function
-# TODO test update function edge cases
-# TODO figure out a "lunch break" system (?)
-# TODO import pycfg to view control flow graphs
->>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
 
 # ========================= MAIN TO DO LIST =========================
 # TODO link python output to sync with MS Teams
@@ -98,6 +90,8 @@ Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Finds a specified user from the log and returns a string with their attedance information
 """
+
+
 def get_attendance(userID: int, df_log: pd.DataFrame) -> str:
     return str(df_log.at[userID, "If Present:"])
 
@@ -135,7 +129,9 @@ def clock_out(userID: int, log: pd.DataFrame) -> None:
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
     log.at[userID, "Time Checkout:"] = curr_time_str
     log.at[userID, "If Present:"] = "Absent"
-    time_difference = curr_time - datetime.datetime.strptime(log.at[userID, "Time Entered:"], "%Y-%m-%d %H:%M:%S")
+    time_difference = curr_time - datetime.datetime.strptime(
+        log.at[userID, "Time Entered:"], "%Y-%m-%d %H:%M:%S"
+    )
     log.at[userID, "Duration:"] = str(time_difference)[:-7]
 
 
@@ -261,13 +257,18 @@ Description: Takes a scanned ID card, pulls the ID number, and 'sanitizes' it by
 
 
 def scan(df_log: pd.DataFrame) -> int:
-    studentid = input("Please scan your student ID card now.")
-    studentid = santize(studentid)
+    studentid = input(
+        "Please scan your student ID card now, or type STOP to halt the punch clock program."
+    )
+    if studentid.upper() == "STOP":
+        return -999
+    else:
+        studentid = santize(studentid)
     return studentid
 
 
 """
-# ------This funcion would convert studentid number that is being swiped into actual studentid number----
+# ------Sanitize---------------------
 Parameters: E_id - string containing the student ID number passed by scan function
 Returns: re_sanitized - the student ID number as an integer
 Possible Errors: N/A - The regex match will simply fail
@@ -280,33 +281,29 @@ def santize(E_id: str) -> int:
     # Perform regex match on ID string, ignoring characters
     re_sanitized = re.split(r"(1[0-9]{7})", E_id)
     if re_sanitized == None:
-<<<<<<< HEAD
-        re_sanitized = input("ID extraction failed, please enter your student ID by tpying the numbers here:")
-    else: # Search the list returned by regex.split for the ID string
+        re_sanitized = input(
+            "ID extraction failed, please enter your student ID by tpying the numbers here:"
+        )
+    else:  # Search the list returned by regex.split for the ID string
         for item in re_sanitized:
-            if len(item) == 8:  # Student IDs are 8 digits long, 7 if indexed at 0
+            if len(item) == 8:
                 re_sanitized = item
-        # Type conversion to int
-=======
-        pass
-    # Search the list returned by regex.split for the ID string
-    for item in re_sanitized:
-        if len(item) == 8:  # Student IDs are 8 digits long, 7 if indexed at 0
-            re_sanitized = item
     # Type conversion to int
->>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
     re_sanitized = int(re_sanitized)
     return re_sanitized
 
+
 """
 # ----------Login---------------
-Parameters: None
+Parameters: df_log - pandas DataFrame being altered
 Returns: None
 Possible Errors: TODO
 Calls: Basic Python, getpass
 Description: Admin login system which grants access to admin functions like erase_user and update_[user_field]
 """
-def login() -> None:
+
+
+def login(df_log: pd.DataFrame) -> None:
     print(Back.CYAN + "Please Enter Password :")
     print(Back.YELLOW + "Student ID Attendance System")
     password = getpass.getpass()
@@ -317,15 +314,71 @@ def login() -> None:
             "------------------------------------------------------------------------------------------------------------------------"
         )
         print(Back.BLUE + "Card Swipe Attendance System: ")
-        afterlogin()
+        afterlogin(df_log)
     if password != "fsae":
         print("Invalid Password")
-        login()
+        login(df_log)
+
 
 """
-# --------------ViewDataset------------------------
+# ----------AdminScreen-----------------------
+Parameters: df_log - pandas DataFrame being altered
 """
-def viewdata() -> None:
+
+
+def afterlogin(df_log: pd.DataFrame) -> None:
+    print("+------------------------------+")
+    print("|  1- Add New Member            |")
+    print("|  2- View logs                 |")
+    print("|  3- Resync Attendance Log(WIP)|")
+    print("+------------------------------+")
+    user_input = input("Select either 1, 2, or 3: ")
+    if user_input == "1":
+        add_user(df_log)
+    if user_input == "2":
+        log_input = input(
+            "Would you like to view the current log (1), or the latest copy from OneDrive (2)?"
+        )
+        if log_input == "1":
+            view_DataFrame(df_log)
+        if log_input == "2":
+            view_csv()
+    if user_input == "3":
+        resync_log()
+    while user_input != "1" or user_input != "2" or user_input != "3":
+        user_input = input("Select either 1, 2, or 3: ")
+        if user_input == "1":
+            add_user(df_log)
+            break
+        if user_input == "2":
+            log_input = input(
+                "Would you like to view the current log (1), or the latest copy from OneDrive (2)?"
+            )
+            if log_input == "1":
+                view_DataFrame(df_log)
+            if log_input == "2":
+                view_csv()
+            break
+        if user_input == "3":
+            resync_log()
+            break
+
+
+"""
+# --------------view_DataFrame------------------------
+"""
+
+
+def view_DataFrame(df_log: pd.DataFrame) -> None:
+    print(df_log)
+
+
+"""
+# --------------view_csvset------------------------
+"""
+
+
+def view_csv() -> None:
     rows = []
     with open("FSAETEAMLEAD.csv", "r") as file:
         csvreader = csv.reader(file)
@@ -333,27 +386,59 @@ def viewdata() -> None:
             rows.append(row)
             print(row)
 
+
 """
-# ----------AdminScreen-----------------------
+# ---------- Resync Log-----------------------
 """
-def afterlogin() -> None:
-    print("+------------------------------+")
-    print("|  1- Add New Team Lead         |")
-    print("|  2- View Record               |")
-    print("+------------------------------+")
-    user_input = input("")
-    if user_input=='1':
-        add_User()
-    if user_input=='2':
-        viewdata()
-    while user_input != '1' or user_input != '2':
-        user_input=input("Select either 1 or 2: ")
-        if user_input == '1':
-            add_User()
+
+
+def resync_log():
+    print(
+        "This function currently does nothing. It will soon resync the log to OneDrive."
+    )
+
+
+"""
+# ------Attendance Loop---------------------
+Parameters: df_log - pandas DataFrame being altered
+Returns: None
+Possible Errors: KeyError - A user does not exist in the system and needs to be added; ValueError - a serious error has occured to the indexing scheme
+Calls: Pandas Helpers, basic python, scan, get_attendance clock_in, and clock_out
+"""
+
+
+def attendance_loop(df_log: pd.DataFrame) -> None:
+    while True:
+        try:
+            user_ID = scan(df_log)
+        except KeyError:
+            print(
+                "This user is not entered into the system. Please contact the system admin."
+            )
             break
-        if user_input == '2':
-            viewdata()
+        except ValueError:
+            print(
+                "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing scheme has been altered. Please contact the system admin."
+            )
             break
+        # Stop the infinite attendance logging loop to allow for admin login or program termination
+        if (
+            user_ID == -999
+        ):  # -999 marks a sentinel integer that scan() passes up if a user types STOP instead of scanning an ID
+            stop_command = input(
+                "Would you like to enter the admin menu (A), or exit the program (X)?"
+            )
+            if stop_command.upper() == "A":
+                login(df_log)
+            if stop_command.upper() == "X":
+                sys.exit()
+            break
+        else:
+            # Mark user's attendance in the log
+            if get_attendance(user_ID, df_log).upper() == "PRESENT":
+                clock_out(user_ID, df_log)
+            else:
+                clock_in(user_ID, df_log)
 
 
 """
@@ -364,89 +449,31 @@ Possible Errors: Many - exception handling should catch the glaring ones that th
 Calls: pandas helpers, basic python, all above functions
 Description: Main driver for the punch clock, this function should run infinitely, or until the admin closes the program
 """
-<<<<<<< HEAD
-def main_menu() -> None: # TODO Restructure menu
-    filename: str = "FSAETEAMLEAD.csv"
-    attendance_log = build_df(filename)
-    menu_input: str = input("Would you like to start the punch clock? (y/yes or n/no)")
-    if menu_input.upper() == "Y" or menu_input.upper() == "YES":
-        while True:
-            print("+------------------------------+")
-            print("|  1- Mark Attendance          |")
-            print("|  2- Admin Login              |")
-            print("+------------------------------+")
-            menu_input = input("Enter 1 or 2 for menu options, and enter x to close the system.")
-            if menu_input == "1":
-                try:
-                    user_ID = scan(attendance_log)
-                except KeyError:
-                    error_handler: str = input(
-                        "This user is not entered into the system, would you like to add this user? (y/yes or n/no)"
-                    )
-                    if error_handler.upper() == "Y" or error_handler.upper() == "YES":
-                        add_User(userID, attendance_log)
-                    else:  # What should we do if the user thinks they're in the system but it returns a KeyError?
-                        pass
-                except ValueError:
-                    print(
-                        "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing scheme has been altered. Please contact the system admin."
-                    )
-                    sys.exit()
-                if(get_attendance(user_ID, attendance_log).upper() == "PRESENT"):
-                    clock_out(user_ID, attendance_log)
-                else:
-                    clock_in(user_ID, attendance_log)
-                print(attendance_log)
-            if menu_input == "2":
-                login()
-            if menu_input.upper() == "X":
-                sys.exit()
-            # Clear previous user data from variables
-            userID = np.Inf
-    else:
-        sys.exit() # Need to rework menu flow, this is placeholder
-=======
 
 
 def main_menu() -> None:
     filename: str = "FSAETEAMLEAD.csv"
     attendance_log = build_df(filename)
-    start: str = input("Would you like to start the punch clock? (y/yes or n/no)")
-    if start.upper() == "Y" or start.upper() == "YES":
-        while True:
-            userID = scan(attendance_log)
-            specified_user = None
-            try:
-                specified_user = locate_user(userID, attendance_log)
-            except KeyError:
-                error_handler: str = input(
-                    "This user is not entered into the system, would you like to add this user? (y/yes or n/no)"
-                )
-                if error_handler.upper() == "Y" or error_handler.upper() == "YES":
-                    add_User(userID, attendance_log)
-                else:  # What should we do if the user thinks they're in the system but it returns a KeyError?
-                    pass
-            except ValueError:
-                print(
-                    "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing has been altered. Please contact the system admin."
-                )
-                # TODO Should we quit if this error occurs, or handle it and continue running?
-            if specified_user["If Present:"] == "Absent":
-                clock_in(userID, attendance_log)
-            else:
-                clock_out(userID, attendance_log)
-
-            # Clear previous user data from variables
-            userID = np.Inf
-            specified_user = None
-    else:  # TODO The rest of the menu occurs here (i.e. admin functions, erasing/updating users, etc.)
-        pass
->>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
+    print("+------------------------------+")
+    print("|  1- Mark Attendance          |")
+    print("|  2- Admin Login              |")
+    print("+------------------------------+")
+    menu_input = input(
+        "Enter 1 or 2 for menu options, and enter x to close the system."
+    )
+    if menu_input == "1":
+        attendance_loop(attendance_log)
+        # Reset userID to numpy infinity value as a way of emptying the old user ID
+        userID = np.Inf
+    if menu_input == "2":
+        login(attendance_log)
+    if menu_input.upper() == "X":
+        sys.exit()
 
 
 # ------Test Driver------------------------
 if __name__ == "__main__":
-    
+
     """
     # --------------------Test history--------------------
     # locate_user test
@@ -475,4 +502,3 @@ if __name__ == "__main__":
     print(divider)
     """
     main_menu()
-    
