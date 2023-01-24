@@ -5,6 +5,13 @@
 # TODO function that allows user to navigate through the screen (go back if you select the wrong menu)
 # TODO finish exception handling
 #   TODO Finalize sanitize exception handling
+<<<<<<< HEAD
+=======
+# TODO add admin menu to main_menu function
+# TODO test update function edge cases
+# TODO figure out a "lunch break" system (?)
+# TODO import pycfg to view control flow graphs
+>>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
 
 # ========================= MAIN TO DO LIST =========================
 # TODO link python output to sync with MS Teams
@@ -47,6 +54,8 @@ Possible Errors: Dependent on the error caught during the reading of the file (p
 Calls: pandas helpers, basic python
 Description: Creates a pandas DataFrame object from the given csv file, and sets the index of the frame to the ID column
 """
+
+
 def build_df(filename: str) -> pd.DataFrame:
     if os.path.isfile(filename):
         try:
@@ -75,6 +84,8 @@ Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Finds a specified user from the log and returns a series (row) with their information
 """
+
+
 def locate_user(userID: int, log: pd.DataFrame) -> pd.Series:
     return pd.Series(log.loc[userID])
 
@@ -99,6 +110,8 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
 Description: Sets the specified user to 'Present' and clocks the time they swipped their card.
 """
+
+
 def clock_in(userID: int, log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -115,6 +128,8 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]; D
 Calls: pandas helpers, datetime, basic python
 Description:
 """
+
+
 def clock_out(userID: int, log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -132,6 +147,8 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col];
 Calls: scan, pandas helpers, datetime, basic python
 Description: Adds a new user to the log with their requested information, and fills the time logs with NaN values.
 """
+
+
 def add_user(log: pd.DataFrame) -> pd.DataFrame:
     userID: int = scan(log)
     # Note to Ron - These input statements are placeholders; feel free to replace with UX messages if you so choose
@@ -174,6 +191,8 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
 Description: Updates the name of a scanned ID.
 """
+
+
 def update_name(userID: int, log: pd.DataFrame) -> None:
     new_name: str = input("Please enter your new username.")
     log.loc[userID, "Name"] = new_name
@@ -187,6 +206,8 @@ Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Updates the phone number of the specified user
 """
+
+
 def update_number(userID: int, log: pd.DataFrame) -> None:
     new_num: str = input("Please enter your new phone number.")
     log.loc[userID, "Phone Num"] = new_num
@@ -200,6 +221,8 @@ Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Updates the team title of the specified user
 """
+
+
 def update_title(userID: int, log: pd.DataFrame) -> None:
     new_title: str = input("Please enter your new title.")
     log.loc[userID, "Title"] = new_title
@@ -213,6 +236,8 @@ Possible Errors: KeyError - missing ID
 Calls: pandas helpers, basic python
 Description: Asks for confirmation, twice, before erasing a user from the log
 """
+
+
 def erase_user(userID: int, log: pd.DataFrame) -> None:
     confirm1: str = input(
         "Please type yes (or y) to confirm you would like to delete this user."
@@ -233,6 +258,8 @@ Possible Errors: None (?)
 Calls: sanitize, pandas helpers, basic python
 Description: Takes a scanned ID card, pulls the ID number, and 'sanitizes' it by removing junk values using RegEx
 """
+
+
 def scan(df_log: pd.DataFrame) -> int:
     studentid = input("Please scan your student ID card now.")
     studentid = santize(studentid)
@@ -247,16 +274,27 @@ Possible Errors: N/A - The regex match will simply fail
 Calls: re, basic python
 Description: parse the scanned ID string using RegEx to match the ID number without the junk data, and return it as an integer
 """
+
+
 def santize(E_id: str) -> int:
     # Perform regex match on ID string, ignoring characters
     re_sanitized = re.split(r"(1[0-9]{7})", E_id)
     if re_sanitized == None:
+<<<<<<< HEAD
         re_sanitized = input("ID extraction failed, please enter your student ID by tpying the numbers here:")
     else: # Search the list returned by regex.split for the ID string
         for item in re_sanitized:
             if len(item) == 8:  # Student IDs are 8 digits long, 7 if indexed at 0
                 re_sanitized = item
         # Type conversion to int
+=======
+        pass
+    # Search the list returned by regex.split for the ID string
+    for item in re_sanitized:
+        if len(item) == 8:  # Student IDs are 8 digits long, 7 if indexed at 0
+            re_sanitized = item
+    # Type conversion to int
+>>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
     re_sanitized = int(re_sanitized)
     return re_sanitized
 
@@ -326,6 +364,7 @@ Possible Errors: Many - exception handling should catch the glaring ones that th
 Calls: pandas helpers, basic python, all above functions
 Description: Main driver for the punch clock, this function should run infinitely, or until the admin closes the program
 """
+<<<<<<< HEAD
 def main_menu() -> None: # TODO Restructure menu
     filename: str = "FSAETEAMLEAD.csv"
     attendance_log = build_df(filename)
@@ -366,6 +405,43 @@ def main_menu() -> None: # TODO Restructure menu
             userID = np.Inf
     else:
         sys.exit() # Need to rework menu flow, this is placeholder
+=======
+
+
+def main_menu() -> None:
+    filename: str = "FSAETEAMLEAD.csv"
+    attendance_log = build_df(filename)
+    start: str = input("Would you like to start the punch clock? (y/yes or n/no)")
+    if start.upper() == "Y" or start.upper() == "YES":
+        while True:
+            userID = scan(attendance_log)
+            specified_user = None
+            try:
+                specified_user = locate_user(userID, attendance_log)
+            except KeyError:
+                error_handler: str = input(
+                    "This user is not entered into the system, would you like to add this user? (y/yes or n/no)"
+                )
+                if error_handler.upper() == "Y" or error_handler.upper() == "YES":
+                    add_User(userID, attendance_log)
+                else:  # What should we do if the user thinks they're in the system but it returns a KeyError?
+                    pass
+            except ValueError:
+                print(
+                    "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing has been altered. Please contact the system admin."
+                )
+                # TODO Should we quit if this error occurs, or handle it and continue running?
+            if specified_user["If Present:"] == "Absent":
+                clock_in(userID, attendance_log)
+            else:
+                clock_out(userID, attendance_log)
+
+            # Clear previous user data from variables
+            userID = np.Inf
+            specified_user = None
+    else:  # TODO The rest of the menu occurs here (i.e. admin functions, erasing/updating users, etc.)
+        pass
+>>>>>>> 0a2008785e6f8fc81944ac48142b7f2e5f87e0a5
 
 
 # ------Test Driver------------------------
