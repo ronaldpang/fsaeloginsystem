@@ -70,11 +70,11 @@ def build_df(filename: str) -> pd.DataFrame:
 
 """
 # ------Locate User------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: Series - the row of userID
 Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not match the frame (log) index
 Calls: pandas helpers, basic python
-Description: Finds a specified user from the log and returns a series (row) with their information
+Description: Finds a specified user from the df_logand returns a series (row) with their information
 """
 
 
@@ -84,7 +84,7 @@ def locate_user(userID: int, df_log: pd.DataFrame) -> pd.Series:
 
 """
 # ------Get Attendance------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: attendance data as a string
 Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not match the frame (log) index
 Calls: pandas helpers, basic python
@@ -98,7 +98,7 @@ def get_attendance(userID: int, df_log: pd.DataFrame) -> str:
 
 """
 # ------Clock In------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
@@ -116,7 +116,7 @@ def clock_in(userID: int, df_log: pd.DataFrame) -> None:
 
 """
 # ------Clock Out------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]; DateTime shouldn't cause any errors due to its implementation
 Calls: pandas helpers, datetime, basic python
@@ -137,7 +137,7 @@ def clock_out(userID: int, df_log: pd.DataFrame) -> None:
 
 """
 # ------Add User------------------------
-Parameters: log - pandas DataFrame being altered
+Parameters: df_log- pandas DataFrame being altered
 Returns: DataFrame - the updated attendance log
 Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]; 
 Calls: scan, pandas helpers, datetime, basic python
@@ -181,7 +181,7 @@ def add_user(df_log: pd.DataFrame) -> pd.DataFrame:
 
 """
 # ------Update name------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
@@ -196,7 +196,7 @@ def update_name(userID: int, log: pd.DataFrame) -> None:
 
 """
 # ------Update Number------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
 Calls: pandas helpers, basic python
@@ -211,7 +211,7 @@ def update_number(userID: int, df_log: pd.DataFrame) -> None:
 
 """
 # ------Update Title------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
 Calls: pandas helpers, basic python
@@ -225,8 +225,73 @@ def update_title(userID: int, df_log: pd.DataFrame) -> None:
 
 
 """
+# ------Update Time In------------------------
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
+Returns: None
+Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
+Calls: pandas helpers, basic python
+Description: Updates the time entered of the specified user
+"""
+def update_time_in(userID: int, df_log: pd.DataFrame) -> None:
+    time_string: str = input("Please enter your new check-in time, in the following format: HH:MM:SS (i.e. 09:03:01 for 9:03am).")
+    new_time_dt = datetime.datetime.strptime(time_string, "H%:M%:S%")
+    df_log.loc[userID, "Time Entered:"] = new_time_dt.strftime("H%:M%:S%")
+    if(df_log.loc[userID, "If Present:"] != "Present"):
+        df_log.loc[userID, "If Present:"] = "Present"
+
+
+"""
+# ------Update Time In------------------------
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
+Returns: None
+Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
+Calls: pandas helpers, basic python
+Description: Updates the time entered of the specified user
+"""
+def update_time_out(userID: int, df_log: pd.DataFrame) -> None:
+    time_string: str = input("Please enter your new check-out time, in the following format: HH:MM:SS (i.e. 09:03:01 for 9:03am).")
+    new_time_dt = datetime.datetime.strptime(time_string, "H%:M%:S%")
+    df_log.loc[userID, "Time Checkout:"] = new_time_dt.strftime("H%:M%:S%")
+    df_log.loc[userID, "Duration:"] = datetime.datetime.strptime(df_log.loc[userID, "Time Entered:"], "H%:M%:S%") - new_time_dt
+    if(df_log.loc[userID, "If Present:"] != "Absent"):
+        df_log.loc[userID, "If Present:"] = "Absent" 
+
+
+"""
+# ------Update User------------------------
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
+Returns: None
+Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
+Calls: pandas helpers, basic python
+Description: Asks the user what field they would like to update for the given userID, then asks for the updated info from user
+"""
+def update_user(user_ID: int, df_log: pd.DataFrame) -> None:
+    print("+-------------------------------+")
+    print("|  1- Phone Number              |")
+    print("|  2- Name                      |")
+    print("|  3- Title                     |")
+    print("|  4- Time In                   |")
+    print("|  5- Time Out                  |")
+    print("|  b- back to admin menu        |")
+    print("+-------------------------------+")
+    update_input:str = input("What field of user:" + str(user_ID) + " would you like to update? Please choose 1,2,3,4,5, or b.")
+    while update_input.upper() != "B":
+        if update_input.upper() == "1":
+            update_number(user_ID, df_log)
+        if update_input.upper() == "2":
+            update_name(user_ID, df_log)
+        if update_input.upper() == "3":
+            update_title(user_ID, df_log)
+        if update_input.upper() == "4":
+            update_time_in(user_ID, df_log)
+        if update_input.upper() == "5":
+            update_time_out(user_ID, df_log)
+        update_input = ""
+
+
+"""
 # ------Erase User------------------------
-Parameters: userID - the integer ID of the most recent card swipped; log - pandas DataFrame being altered
+Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID
 Calls: pandas helpers, basic python
@@ -314,7 +379,7 @@ def login(df_log: pd.DataFrame) -> None:
             "------------------------------------------------------------------------------------------------------------------------"
         )
         print(Back.BLUE + "Card Swipe Attendance System: ")
-        afterlogin(df_log)
+        admin_menu(df_log)
     if password != "fsae":
         print("Invalid Password")
         login(df_log)
@@ -326,44 +391,52 @@ Parameters: df_log - pandas DataFrame being altered
 """
 
 
-def afterlogin(df_log: pd.DataFrame) -> None:
-    print("+------------------------------+")
-    print("|  1- Add New Member            |")
-    print("|  2- View logs                 |")
-    print("|  3- Resync Attendance Log(WIP)|")
-    print("+------------------------------+")
-    user_input = input("Select either 1, 2, or 3: ")
-    if user_input == "1":
-        df_log = add_user(df_log)
-    if user_input == "2":
-        log_input = input(
-            "Would you like to view the current log (1), or the latest copy from OneDrive (2)?"
-        )
-        if log_input == "1":
-            view_DataFrame(df_log)
-        if log_input == "2":
-            view_csv()
-    if user_input == "3":
-        resync_log()
-    while user_input != "1" or user_input != "2" or user_input != "3":
-        user_input = input("Select either 1, 2, or 3: ")
-        if user_input == "1":
-            df_log = add_user(df_log)
-            break
-        if user_input == "2":
-            log_input = input(
-                "Would you like to view the current log (1), or the latest copy from OneDrive (2)?"
-            )
-            if log_input == "1":
+def admin_menu(df_log: pd.DataFrame) -> None:
+    user_input: str = ""
+    while user_input.upper() != "B":
+        print("+-------------------------------+")
+        print("|  1- View Logs                 |")
+        print("|  2- Sync Logs                 |")
+        print("|  3- Add New User              |")
+        print("|  4- Erase User                |")
+        print("|  5- Update Existing User      |")
+        print("|  b- back to Main Menu         |")
+        print("+-------------------------------+")
+        user_input = input("Please select an option from the menu above. Enter 1,2,3,4,5, or b.")
+        if user_input.upper() == "1":
+            log_input = input("Would you like to view the current program log (1) or the last system log (2)?")
+            if log_input.upper() == "1":
                 view_DataFrame(df_log)
-            if log_input == "2":
+            if log_input.upper() == "2":
                 view_csv()
+        if user_input.upper() == "2":
+            pass
+        if user_input.upper() == "3":
+            df_log = add_user(df_log)
+        if user_input.upper() == "4":
+            erase_ID = scan(df_log)
+            try:
+                erase_user(df_log)
+            except KeyError:
+                print("The specified user cannot be deleted as their ID was not found in the current program log.")
+            except ValueError:
+                print("An error has occurred relating to the indexing scheme of the log. Please contact the system admin.")
+                sys.exit()
+        if user_input.upper() == "5":
+            update_ID = scan(df_log)
+            update_user(update_ID, df_log)
+            """
+            try:
+                
+            except KeyError:
+                print("The specified user cannot be updated as their ID was not found in the current program log.")
+            except ValueError:
+                print("An error has occurred relating to the indexing scheme of the log. Please contact the system admin.")
+                sys.exit()
+            """
+        if user_input.upper() == "B":
             break
-        if user_input == "3":
-            resync_log()
-            break
-
-
+            
 """
 # --------------view_DataFrame------------------------
 """
@@ -394,7 +467,7 @@ def view_csv() -> None:
 
 def resync_log():
     print(
-        "This function currently does nothing. It will soon resync the log to OneDrive."
+        "This function currently does nothing. It will soon resync the df_logto OneDrive."
     )
 
 
@@ -409,18 +482,7 @@ Calls: Pandas Helpers, basic python, scan, get_attendance clock_in, and clock_ou
 
 def attendance_loop(df_log: pd.DataFrame) -> None:
     while True:
-        try:
-            user_ID = scan(df_log)
-        except KeyError:
-            print(
-                "This user is not entered into the system. Please contact the system admin."
-            )
-            break
-        except ValueError:
-            print(
-                "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing scheme has been altered. Please contact the system admin."
-            )
-            break
+        user_ID = scan(df_log)
         # Stop the infinite attendance logging loop to allow for admin login or program termination
         if (
             user_ID == -999
@@ -433,12 +495,23 @@ def attendance_loop(df_log: pd.DataFrame) -> None:
             if stop_command.upper() == "X":
                 sys.exit()
             break
-        else:
+        try:
             # Mark user's attendance in the log
             if get_attendance(user_ID, df_log).upper() == "PRESENT":
                 clock_out(user_ID, df_log)
             else:
                 clock_in(user_ID, df_log)
+        except KeyError:
+            print(
+                "This user is not entered into the system. Please contact the system admin."
+            )
+            # TODO add ability for user to scan card, add themself (without entering name, title, etc), and clock them in
+            break
+        except ValueError:
+            print(
+                "An indexing error has occured. Either the specified ID is not an index for a user, or the indexing scheme has been altered. Please contact the system admin."
+            )
+            break
 
 
 """
@@ -455,24 +528,27 @@ def main_menu() -> None:
     filename: str = "FSAETEAMLEAD.csv"
     attendance_log = build_df(filename)
     print("+------------------------------+")
-    print("|  1- Mark Attendance          |")
-    print("|  2- Admin Login              |")
+    print("|  1- Admin Login              |")
+    print("|  2- Start Punchclock         |")
+    print("|  x- Close Program            |")
     print("+------------------------------+")
     menu_input = input(
         "Enter 1 or 2 for menu options, and enter x to close the system."
     )
     while menu_input.upper() != "X":
         if menu_input == "1":
-            attendance_loop(attendance_log)
-        if menu_input == "2":
             login(attendance_log)
-    if menu_input.upper() == "X":
-        sys.exit()
+        elif menu_input == "2":
+            attendance_loop(attendance_log)
+        elif menu_input.upper() == "X":
+            sys.exit()
+        else:
+            menu_input = input("Please enter either a 1, 2, or x.")
 
 
 # ------Test Driver------------------------
 if __name__ == "__main__":
-
+    divider="==============================================="
     """
     # --------------------Test history--------------------
     # locate_user test
@@ -497,7 +573,7 @@ if __name__ == "__main__":
     print(divider)
     # Add_user test
     test_log = add_user(test_log)
-    print(test_log)
-    print(divider)
     """
+    
+    
     main_menu()
