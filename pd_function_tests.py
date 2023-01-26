@@ -78,8 +78,8 @@ Description: Finds a specified user from the log and returns a series (row) with
 """
 
 
-def locate_user(userID: int, log: pd.DataFrame) -> pd.Series:
-    return pd.Series(log.loc[userID])
+def locate_user(userID: int, df_log: pd.DataFrame) -> pd.Series:
+    return pd.Series(df_log.loc[userID])
 
 
 """
@@ -106,12 +106,12 @@ Description: Sets the specified user to 'Present' and clocks the time they swipp
 """
 
 
-def clock_in(userID: int, log: pd.DataFrame) -> None:
+def clock_in(userID: int, df_log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
-    log.at[userID, "Time Entered:"] = curr_time_str
-    log.at[userID, "Time Checkout:"] = np.nan
-    log.at[userID, "If Present:"] = "Present"
+    df_log.at[userID, "Time Entered:"] = curr_time_str
+    df_log.at[userID, "Time Checkout:"] = np.nan
+    df_log.at[userID, "If Present:"] = "Present"
 
 
 """
@@ -124,15 +124,15 @@ Description:
 """
 
 
-def clock_out(userID: int, log: pd.DataFrame) -> None:
+def clock_out(userID: int, df_log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
-    log.at[userID, "Time Checkout:"] = curr_time_str
-    log.at[userID, "If Present:"] = "Absent"
+    df_log.at[userID, "Time Checkout:"] = curr_time_str
+    df_log.at[userID, "If Present:"] = "Absent"
     time_difference = curr_time - datetime.datetime.strptime(
-        log.at[userID, "Time Entered:"], "%Y-%m-%d %H:%M:%S"
+        df_log.at[userID, "Time Entered:"], "%Y-%m-%d %H:%M:%S"
     )
-    log.at[userID, "Duration:"] = str(time_difference)[:-7]
+    df_log.at[userID, "Duration:"] = str(time_difference)[:-7]
 
 
 """
@@ -145,8 +145,8 @@ Description: Adds a new user to the log with their requested information, and fi
 """
 
 
-def add_user(log: pd.DataFrame) -> pd.DataFrame:
-    userID: int = scan(log)
+def add_user(df_log: pd.DataFrame) -> pd.DataFrame:
+    userID: int = scan(df_log)
     # Note to Ron - These input statements are placeholders; feel free to replace with UX messages if you so choose
     userName: str = input("Please provide your First and Last name.")
     userNum: str = input("Please provide your phone number.")
@@ -168,15 +168,15 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
         }
     )
     # Reset the two table's indexes before concatination
-    log.reset_index(drop=False, inplace=True)
+    df_log.reset_index(drop=False, inplace=True)
     # Combine
-    log = pd.concat([log, new_row.to_frame().T], ignore_index=True)
+    df_log = pd.concat([df_log, new_row.to_frame().T], ignore_index=True)
     # Set ID column to type int
-    log["ID"] = log["ID"].astype(int)
+    df_log["ID"] = df_log["ID"].astype(int)
     # Set index to ID
-    log = log.set_index("ID")
+    df_log = df_log.set_index("ID")
 
-    return log
+    return df_log
 
 
 """
@@ -204,9 +204,9 @@ Description: Updates the phone number of the specified user
 """
 
 
-def update_number(userID: int, log: pd.DataFrame) -> None:
+def update_number(userID: int, df_log: pd.DataFrame) -> None:
     new_num: str = input("Please enter your new phone number.")
-    log.loc[userID, "Phone Num"] = new_num
+    df_log.loc[userID, "Phone Num"] = new_num
 
 
 """
@@ -219,9 +219,9 @@ Description: Updates the team title of the specified user
 """
 
 
-def update_title(userID: int, log: pd.DataFrame) -> None:
+def update_title(userID: int, df_log: pd.DataFrame) -> None:
     new_title: str = input("Please enter your new title.")
-    log.loc[userID, "Title"] = new_title
+    df_log.loc[userID, "Title"] = new_title
 
 
 """
@@ -234,16 +234,16 @@ Description: Asks for confirmation, twice, before erasing a user from the log
 """
 
 
-def erase_user(userID: int, log: pd.DataFrame) -> None:
+def erase_user(userID: int, df_log: pd.DataFrame) -> None:
     confirm1: str = input(
         "Please type yes (or y) to confirm you would like to delete this user."
     )
     if confirm1.upper() == "YES" or confirm1.upper() == "Y":
         confirm2: str = input(
-            "WARNING: You are about to delete a user from the log! Are you sure you want to do this?"
+            "WARNING: You are about to delete a user from the df_log! Are you sure you want to do this?"
         )
         if confirm2.upper() == "YES" or confirm2.upper() == "Y":
-            log.drop([userID], axis=0, inplace=True)
+            df_log.drop([userID], axis=0, inplace=True)
 
 
 """
@@ -334,7 +334,7 @@ def afterlogin(df_log: pd.DataFrame) -> None:
     print("+------------------------------+")
     user_input = input("Select either 1, 2, or 3: ")
     if user_input == "1":
-        add_user(df_log)
+        df_log = add_user(df_log)
     if user_input == "2":
         log_input = input(
             "Would you like to view the current log (1), or the latest copy from OneDrive (2)?"
@@ -348,7 +348,7 @@ def afterlogin(df_log: pd.DataFrame) -> None:
     while user_input != "1" or user_input != "2" or user_input != "3":
         user_input = input("Select either 1, 2, or 3: ")
         if user_input == "1":
-            add_user(df_log)
+            df_log = add_user(df_log)
             break
         if user_input == "2":
             log_input = input(
@@ -411,11 +411,6 @@ def attendance_loop(df_log: pd.DataFrame) -> None:
     while True:
         try:
             user_ID = scan(df_log)
-            # Mark user's attendance in the log
-            if get_attendance(user_ID, df_log).upper() == "PRESENT":
-                clock_out(user_ID, df_log)
-            else:
-                clock_in(user_ID, df_log)
         except KeyError:
             print(
                 "This user is not entered into the system. Please contact the system admin."
@@ -438,6 +433,12 @@ def attendance_loop(df_log: pd.DataFrame) -> None:
             if stop_command.upper() == "X":
                 sys.exit()
             break
+        else:
+            # Mark user's attendance in the log
+            if get_attendance(user_ID, df_log).upper() == "PRESENT":
+                clock_out(user_ID, df_log)
+            else:
+                clock_in(user_ID, df_log)
 
 
 """
@@ -460,12 +461,11 @@ def main_menu() -> None:
     menu_input = input(
         "Enter 1 or 2 for menu options, and enter x to close the system."
     )
-    if menu_input == "1":
-        attendance_loop(attendance_log)
-        # Reset userID to numpy infinity value as a way of emptying the old user ID
-        userID = np.Inf
-    if menu_input == "2":
-        login(attendance_log)
+    while menu_input.upper() != "X":
+        if menu_input == "1":
+            attendance_loop(attendance_log)
+        if menu_input == "2":
+            login(attendance_log)
     if menu_input.upper() == "X":
         sys.exit()
 
