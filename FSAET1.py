@@ -1,13 +1,22 @@
-# TODO link python output to sync with MS Teams
-# TODO implement the veriy user system
-# TODO make an excel sheet with all of the team leads info
-# TODO get the raspberry pi from john
-# TODO swipe card once: login, swipe card twice:logout
-# TODO function that will erase all data if user selects its
-# TODO function that allows user to navigate through the screen
+#TODO implement the veriy user system
+#TODO make an excel sheet with all of the team leads info
+#TODO swipe card once: login, swipe card twice:logout
+#TODO function that will erase all data if user selects its 
+#TODO function that allows user to navigate through the screen ****
+#TODO implementation of the raspberry pi as a login system
+#TODO rework the screenchoice() UI ****
+#TODO make an excutable file that could run off of the raspberry pi
+#TODO ensure that indents and spacing are all regular instead of tab spacing ****
+#TODO rework the UI frame once the raspberry pi on infinite loop works
+#TODO have everything running off of main instead as of a function set depending on what the conditions are
+#TODO black the whole line of code for spacing consistency 
+#TODO add another user option where if the user_input==3 then quit and shut the whole program
+#TODO time the code to see how long it takes to run on laptop&raspberry
 
 
-# -----libraries used: time, png, getpass, tqdm, sqlite3, pyzbar, pyqrcode, cv2, os, numpy, colorama----
+
+
+#-----libraries used: time, png, getpass, tqdm, sqlite3, pyzbar, pyqrcode, cv2, os, numpy, colorama, pandas, numpy, re----
 import datetime
 import png
 import getpass
@@ -21,7 +30,6 @@ from csv import writer
 import csv
 import pandas as pd
 import numpy as np
-
 colorama.init(autoreset=True)
 import re
 
@@ -101,7 +109,7 @@ def add_user(log: pd.DataFrame) -> pd.DataFrame:
             "If Present": None,
         }
     )
-    # Reset the two table's indexes before concatination
+    # Reset the two table's indexes before concatenation
     log.reset_index(drop=False, inplace=True)
     # Combine
     log = pd.concat([log, new_row.to_frame().T], ignore_index=True)
@@ -232,6 +240,14 @@ def screenchoice() -> None:
         add_User()
     if user_input == "2":
         viewdata()
+    while user_input!='1' or user_input!='2':
+        user_input=input("Select either 1 or 2: ")
+        if user_input=='1':
+            add_User()
+            break
+        if user_input=='2':
+            viewdata()
+            break
     print("You will now be moved back to the home screen")
 
 
