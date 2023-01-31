@@ -56,7 +56,7 @@ def build_df(filename: str) -> pd.DataFrame:
         except:
             print(
                 "ERROR! An exception occured while trying to read the csv file!",
-                sys.exc_info[2],
+                sys.exc_info()[2],
             )
         return df_log
     else:
