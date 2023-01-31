@@ -525,7 +525,7 @@ Description: Main driver for the punch clock, this function should run infinitel
 
 
 def main_menu() -> None:
-    filename: str = "FSAETEAMLEAD.csv"
+    filename: str = "READONLYFSAE.csv"
     attendance_log = build_df(filename)
     print("+------------------------------+")
     print("|  1- Admin Login              |")
