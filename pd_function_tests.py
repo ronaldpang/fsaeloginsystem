@@ -368,7 +368,7 @@ Description: Admin login system which grants access to admin functions like eras
 """
 
 
-def login(df_log: pd.DataFrame) -> None:
+def login(df_log: pd.DataFrame) -> pd.DataFrame:
     print(Back.CYAN + "Please Enter Password :")
     print(Back.YELLOW + "Student ID Attendance System")
     password = getpass.getpass()
@@ -379,10 +379,11 @@ def login(df_log: pd.DataFrame) -> None:
             "------------------------------------------------------------------------------------------------------------------------"
         )
         print(Back.BLUE + "Card Swipe Attendance System: ")
-        admin_menu(df_log)
+        df_log = admin_menu(df_log)
     if password != "fsae":
         print("Invalid Password")
-        login(df_log)
+        df_log = login(df_log)
+    return df_log
 
 
 """
@@ -391,7 +392,7 @@ Parameters: df_log - pandas DataFrame being altered
 """
 
 
-def admin_menu(df_log: pd.DataFrame) -> None:
+def admin_menu(df_log: pd.DataFrame) -> pd.DataFrame:
     user_input: str = ""
     while user_input.upper() != "B":
         print("+-------------------------------+")
@@ -436,7 +437,7 @@ def admin_menu(df_log: pd.DataFrame) -> None:
             """
         if user_input.upper() == "B":
             break
-            
+    return df_log    
 """
 # --------------view_DataFrame------------------------
 """
@@ -537,7 +538,7 @@ def main_menu() -> None:
     )
     while menu_input.upper() != "X":
         if menu_input == "1":
-            login(attendance_log)
+            attendance_log = login(attendance_log)
         elif menu_input == "2":
             attendance_loop(attendance_log)
         elif menu_input.upper() == "X":
