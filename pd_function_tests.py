@@ -67,7 +67,15 @@ def build_df(filename: str) -> pd.DataFrame:
         )
         sys.exit()
 
+def output_tocsv(filename: str) -> pd.DataFrame:
+    df_output = pd.read(add_user.df_log())
+    return df_output.to_csv('READONLYFSAE.csv', index=True)
 
+    
+    
+    
+    
+    
 """
 # ------Locate User------------------------
 Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
@@ -175,8 +183,10 @@ def add_user(df_log: pd.DataFrame) -> pd.DataFrame:
     df_log["ID"] = df_log["ID"].astype(int)
     # Set index to ID
     df_log = df_log.set_index("ID")
+    
+    
 
-    return df_log
+    return df_log.to_csv('READONLYFSAE.csv', index=True)
 
 
 """
@@ -580,3 +590,7 @@ if __name__ == "__main__":
     
     
     main_menu()
+
+
+
+
