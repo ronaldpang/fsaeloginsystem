@@ -367,7 +367,7 @@ Calls: Basic Python, getpass
 Description: Admin login system which grants access to admin functions like erase_user and update_[user_field]
 """
 
-
+# TODO rewrite for a loop
 def login(df_log: pd.DataFrame) -> pd.DataFrame:
     print(Back.CYAN + "Please Enter Password :")
     print(Back.YELLOW + "Student ID Attendance System")
@@ -383,6 +383,8 @@ def login(df_log: pd.DataFrame) -> pd.DataFrame:
     if password != "fsae":
         print("Invalid Password")
         df_log = login(df_log)
+    if password.upper() == "b":
+        return df_log
     return df_log
 
 
