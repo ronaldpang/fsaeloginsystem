@@ -239,12 +239,12 @@ def update_time_in(userID: int, df_log: pd.DataFrame) -> None:
 
 
 """
-# ------Update Time In------------------------
+# ------Update Time Out------------------------
 Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
 Returns: None
 Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not match the frame (log) index
 Calls: pandas helpers, basic python
-Description: Updates the time entered of the specified user
+Description: Updates the time checkout of the specified user
 """
 def update_time_out(userID: int, df_log: pd.DataFrame) -> None:
     time_string: str = input("Please enter your new check-out time, in the following format: HH:MM:SS (i.e. 09:03:01 for 9:03am).")
@@ -367,6 +367,7 @@ def login(df_log: pd.DataFrame) -> pd.DataFrame:
     if password.upper() == "BACK":
             return df_log
     if password != "fsae":
+        failed -= 1
         print("Incorrect Password! You have " + str(failed) + " attempts remaining!")
     while password != "fsae":
         print(Back.CYAN + "Please Enter Password, or type 'back' to go back: ")
@@ -375,7 +376,7 @@ def login(df_log: pd.DataFrame) -> pd.DataFrame:
         if password.upper() == "BACK":
             failed = 5
             return df_log
-        failed -=1
+        failed -= 1
         if failed == 0:
             print("Too many incorrect password attempts. Closing Program")
             sys.exit()
@@ -457,15 +458,6 @@ def view_csv() -> None:
         for row in csvreader:
             rows.append(row)
             print(row)
-
-
-"""
-# ---------- Resync Log-----------------------
-"""
-def resync_log():
-    print(
-        "This function currently does nothing. It will soon resync the df_logto OneDrive."
-    )
 
 
 """
