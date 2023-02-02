@@ -46,8 +46,6 @@ Possible Errors: Dependent on the error caught during the reading of the file (p
 Calls: pandas helpers, basic python
 Description: Creates a pandas DataFrame object from the given csv file, and sets the index of the frame to the ID column
 """
-
-
 def build_df(filename: str) -> pd.DataFrame:
     if os.path.isfile(filename):
         try:
@@ -67,15 +65,20 @@ def build_df(filename: str) -> pd.DataFrame:
         )
         sys.exit()
 
-def output_tocsv(filename: str) -> pd.DataFrame:
+
+"""
+# ------Output_toCSV------------------------
+Parameters: filename - the name, as string, of the csv file to be written to
+Returns: None
+Possible Errors: Dependent on the error caught trying to write to the file TODO
+Calls: pandas helpers, basic python
+Description: Calls pandas helper function to_csv, which creates a csv file based on df_log using the filename parameter
+"""
+def output_tocsv(filename: str) -> None:
     df_output = pd.read(add_user.df_log())
     return df_output.to_csv('READONLYFSAE.csv', index=True)
 
-    
-    
-    
-    
-    
+     
 """
 # ------Locate User------------------------
 Parameters: userID - the integer ID of the most recent card swipped; df_log- pandas DataFrame being altered
@@ -84,8 +87,6 @@ Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Finds a specified user from the df_logand returns a series (row) with their information
 """
-
-
 def locate_user(userID: int, df_log: pd.DataFrame) -> pd.Series:
     return pd.Series(df_log.loc[userID])
 
@@ -98,8 +99,6 @@ Possible Errors: KeyError - missing ID, IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Finds a specified user from the log and returns a string with their attedance information
 """
-
-
 def get_attendance(userID: int, df_log: pd.DataFrame) -> str:
     return str(df_log.at[userID, "If Present:"])
 
@@ -112,8 +111,6 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
 Description: Sets the specified user to 'Present' and clocks the time they swipped their card.
 """
-
-
 def clock_in(userID: int, df_log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -130,8 +127,6 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]; D
 Calls: pandas helpers, datetime, basic python
 Description:
 """
-
-
 def clock_out(userID: int, df_log: pd.DataFrame) -> None:
     curr_time = datetime.datetime.now()
     curr_time_str = curr_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -151,8 +146,7 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col];
 Calls: scan, pandas helpers, datetime, basic python
 Description: Adds a new user to the log with their requested information, and fills the time logs with NaN values.
 """
-
-
+# TODO fix input stream to accept all characters
 def add_user(df_log: pd.DataFrame) -> pd.DataFrame:
     userID: int = scan(df_log)
     # Note to Ron - These input statements are placeholders; feel free to replace with UX messages if you so choose
@@ -183,10 +177,10 @@ def add_user(df_log: pd.DataFrame) -> pd.DataFrame:
     df_log["ID"] = df_log["ID"].astype(int)
     # Set index to ID
     df_log = df_log.set_index("ID")
-    
-    
-
-    return df_log.to_csv('READONLYFSAE.csv', index=True)
+    # Update csv with new user info
+    df_log.to_csv('READONLYFSAE.csv', index=True)
+    # return log for viewing within the program
+    return df_log
 
 
 """
@@ -197,8 +191,6 @@ Possible Errors: KeyError - missing ID; ValueError - missing tuple [row, col]
 Calls: pandas helpers, basic python
 Description: Updates the name of a scanned ID.
 """
-
-
 def update_name(userID: int, log: pd.DataFrame) -> None:
     new_name: str = input("Please enter your new username.")
     log.loc[userID, "Name"] = new_name
@@ -212,8 +204,6 @@ Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Updates the phone number of the specified user
 """
-
-
 def update_number(userID: int, df_log: pd.DataFrame) -> None:
     new_num: str = input("Please enter your new phone number.")
     df_log.loc[userID, "Phone Num"] = new_num
@@ -227,8 +217,6 @@ Possible Errors: KeyError - missing ID; IndexingError - the index (ID) does not 
 Calls: pandas helpers, basic python
 Description: Updates the team title of the specified user
 """
-
-
 def update_title(userID: int, df_log: pd.DataFrame) -> None:
     new_title: str = input("Please enter your new title.")
     df_log.loc[userID, "Title"] = new_title
@@ -307,8 +295,6 @@ Possible Errors: KeyError - missing ID
 Calls: pandas helpers, basic python
 Description: Asks for confirmation, twice, before erasing a user from the log
 """
-
-
 def erase_user(userID: int, df_log: pd.DataFrame) -> None:
     confirm1: str = input(
         "Please type yes (or y) to confirm you would like to delete this user."
@@ -329,8 +315,6 @@ Possible Errors: None (?)
 Calls: sanitize, pandas helpers, basic python
 Description: Takes a scanned ID card, pulls the ID number, and 'sanitizes' it by removing junk values using RegEx
 """
-
-
 def scan(df_log: pd.DataFrame) -> int:
     studentid = input(
         "Please scan your student ID card now, or type STOP to halt the punch clock program."
@@ -350,8 +334,6 @@ Possible Errors: N/A - The regex match will simply fail
 Calls: re, basic python
 Description: parse the scanned ID string using RegEx to match the ID number without the junk data, and return it as an integer
 """
-
-
 def santize(E_id: str) -> int:
     # Perform regex match on ID string, ignoring characters
     re_sanitized = re.split(r"(1[0-9]{7})", E_id)
@@ -376,25 +358,33 @@ Possible Errors: TODO
 Calls: Basic Python, getpass
 Description: Admin login system which grants access to admin functions like erase_user and update_[user_field]
 """
-
 # TODO rewrite for a loop
 def login(df_log: pd.DataFrame) -> pd.DataFrame:
-    print(Back.CYAN + "Please Enter Password :")
+    print(Back.CYAN + "Please Enter Password, or type 'back' to go back: ")
     print(Back.YELLOW + "Student ID Attendance System")
     password = getpass.getpass()
-    if password == "fsae":
-        for i in tqdm(range(4000)):
-            print("", end="\r")
-        print(
-            "------------------------------------------------------------------------------------------------------------------------"
-        )
-        print(Back.BLUE + "Card Swipe Attendance System: ")
-        df_log = admin_menu(df_log)
+    failed: int = 5
+    if password.upper() == "BACK":
+            return df_log
     if password != "fsae":
-        print("Invalid Password")
-        df_log = login(df_log)
-    if password.upper() == "b":
-        return df_log
+        print("Incorrect Password! You have " + str(failed) + " attempts remaining!")
+    while password != "fsae":
+        print(Back.CYAN + "Please Enter Password, or type 'back' to go back: ")
+        print(Back.YELLOW + "Student ID Attendance System")
+        password = getpass.getpass()
+        if password.upper() == "BACK":
+            failed = 5
+            return df_log
+        failed -=1
+        if failed == 0:
+            print("Too many incorrect password attempts. Closing Program")
+            sys.exit()
+        elif failed > 1:
+            print("Incorrect Password! You have " + str(failed) + " attempts remaining!")
+        else:
+            print("Incorrect Password! You have " + str(failed) + " attempt remaining!")
+            
+    df_log = admin_menu(df_log)
     return df_log
 
 
@@ -402,8 +392,6 @@ def login(df_log: pd.DataFrame) -> pd.DataFrame:
 # ----------AdminScreen-----------------------
 Parameters: df_log - pandas DataFrame being altered
 """
-
-
 def admin_menu(df_log: pd.DataFrame) -> pd.DataFrame:
     user_input: str = ""
     while user_input.upper() != "B":
@@ -462,11 +450,9 @@ def view_DataFrame(df_log: pd.DataFrame) -> None:
 """
 # --------------view_csvset------------------------
 """
-
-
 def view_csv() -> None:
     rows = []
-    with open("FSAETEAMLEAD.csv", "r") as file:
+    with open("READONLYFSAE.csv", "r") as file:
         csvreader = csv.reader(file)
         for row in csvreader:
             rows.append(row)
@@ -476,8 +462,6 @@ def view_csv() -> None:
 """
 # ---------- Resync Log-----------------------
 """
-
-
 def resync_log():
     print(
         "This function currently does nothing. It will soon resync the df_logto OneDrive."
@@ -491,8 +475,6 @@ Returns: None
 Possible Errors: KeyError - A user does not exist in the system and needs to be added; ValueError - a serious error has occured to the indexing scheme
 Calls: Pandas Helpers, basic python, scan, get_attendance clock_in, and clock_out
 """
-
-
 def attendance_loop(df_log: pd.DataFrame) -> None:
     while True:
         user_ID = scan(df_log)
@@ -551,12 +533,12 @@ def main_menu() -> None:
     while menu_input.upper() != "X":
         if menu_input == "1":
             attendance_log = login(attendance_log)
+            menu_input = input("Please enter either a 1, 2, or x.")
         elif menu_input == "2":
             attendance_loop(attendance_log)
+            menu_input = input("Please enter either a 1, 2, or x.")
         elif menu_input.upper() == "X":
             sys.exit()
-        else:
-            menu_input = input("Please enter either a 1, 2, or x.")
 
 
 # ------Test Driver------------------------
